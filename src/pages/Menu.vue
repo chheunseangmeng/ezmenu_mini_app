@@ -1,0 +1,203 @@
+<template>
+  <section class="relative px-5 pb-28 pt-6">
+    <div class="mx-auto max-w-xl">
+      <div class="mb-3">
+        <h2 class="text-xl text-ink">Order Menu</h2>
+      </div>
+
+      <div class="mb-4">
+        <label class="sr-only" for="menu-search">Search menu</label>
+        <div class="glass-strong flex w-full items-center gap-3 rounded-2xl px-4 py-3">
+          <i class="fa-solid fa-magnifying-glass text-ink/45"></i>
+          <input
+            id="menu-search"
+            v-model="searchQuery"
+            type="search"
+            placeholder="Search the menu"
+            class="w-full bg-transparent text-sm text-ink placeholder:text-ink/40 focus:outline-none"
+          />
+        </div>
+      </div>
+
+      <CategoryNav
+        :categories="categories"
+        :active-category="activeCategory"
+        @change="setCategory"
+      />
+
+      <transition name="toast">
+        <div
+          v-if="toast"
+          class="fixed top-6 left-1/2 z-50 -translate-x-1/2 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50/90 px-4 py-2 text-xs text-emerald-700 shadow-[0_20px_40px_-28px_rgba(16,185,129,0.9)] backdrop-blur-xl"
+        >
+          <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+          {{ toast }}
+        </div>
+      </transition>
+
+      <transition name="success">
+        <div
+          v-if="successToast"
+          class="fixed top-14 left-1/2 z-50 -translate-x-1/2 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50/90 px-4 py-2 text-xs text-emerald-700 shadow-[0_20px_40px_-28px_rgba(16,185,129,0.9)] backdrop-blur-xl"
+        >
+          <span class="grid h-5 w-5 place-items-center rounded-full bg-emerald-500 text-white">
+            <i class="fa-solid fa-check text-[10px]"></i>
+          </span>
+          Payment confirmed
+        </div>
+      </transition>
+
+      <MenuGrid :items="items" @add="add" />
+    </div>
+
+    <CartBar @open="openCart" />
+    <CartModal :open="isCartOpen" @close="closeCart" @checkout="checkout" />
+  </section>
+</template>
+
+<script setup>
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import CartBar from "../components/cart/CartBar.vue";
+import CartModal from "../components/cart/CartModal.vue";
+import CategoryNav from "../components/menu/CategoryNav.vue";
+import MenuGrid from "../components/menu/MenuGrid.vue";
+import { useCartStore } from "../stores/cartStore";
+import { useMenuStore } from "../stores/menuStore";
+
+const cart = useCartStore();
+const menu = useMenuStore();
+const searchQuery = ref("");
+const items = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase();
+  const base = menu.filteredItems;
+  if (!query) return base;
+  return base.filter((item) => {
+    return (
+      item.name.toLowerCase().includes(query) ||
+      item.description.toLowerCase().includes(query)
+    );
+  });
+});
+
+const categories = computed(() => menu.categories);
+const activeCategory = computed(() => menu.activeCategory);
+const setCategory = (key) => menu.setCategory(key);
+const add = (item) => {
+  cart.addItem(item);
+  const tg = window.Telegram?.WebApp;
+  tg?.HapticFeedback?.impactOccurred?.("light");
+};
+
+const isCartOpen = ref(false);
+const openCart = () => {
+  isCartOpen.value = true;
+};
+const closeCart = () => {
+  isCartOpen.value = false;
+};
+
+const toast = ref("");
+let timer = null;
+
+const lastAdded = computed(() => cart.lastAdded);
+const lastAddedAt = computed(() => cart.lastAddedAt);
+
+watch([lastAdded, lastAddedAt], () => {
+  if (!lastAdded.value) return;
+  toast.value = `Added ${lastAdded.value}`;
+  if (timer) clearTimeout(timer);
+  timer = setTimeout(() => {
+    toast.value = "";
+  }, 1400);
+});
+
+onBeforeUnmount(() => {
+  if (timer) clearTimeout(timer);
+  if (successTimer) clearTimeout(successTimer);
+});
+
+const checkout = () => {
+  const tgApp = window.Telegram?.WebApp;
+  tgApp?.HapticFeedback?.notificationOccurred?.("success");
+  successToast.value = true;
+  if (successTimer) clearTimeout(successTimer);
+  successTimer = setTimeout(() => {
+    successToast.value = false;
+  }, 1800);
+  cart.clear();
+  isCartOpen.value = false;
+};
+
+const successToast = ref(false);
+let successTimer = null;
+
+const tg = window.Telegram?.WebApp;
+const updateMainButton = () => {
+  if (!tg?.MainButton) return;
+  if (cart.count > 0) {
+    tg.MainButton.setParams({
+      text: `Checkout • $${cart.total.toFixed(2)}`,
+      color: "#FF5533",
+      text_color: "#FFFFFF",
+      is_active: true
+    });
+    tg.MainButton.show();
+  } else {
+    tg.MainButton.hide();
+  }
+};
+
+const handleMainButton = () => {
+  checkout();
+};
+
+onMounted(() => {
+  if (!tg) return;
+  tg.ready();
+  tg.expand();
+  tg.MainButton?.onClick(handleMainButton);
+  updateMainButton();
+});
+
+onBeforeUnmount(() => {
+  tg?.MainButton?.offClick?.(handleMainButton);
+});
+
+watch(
+  () => [cart.count, cart.total],
+  () => updateMainButton(),
+  { immediate: true }
+);
+</script>
+
+<style scoped>
+.toast-enter-active,
+.toast-leave-active {
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translate(-50%, -8px);
+}
+.toast-enter-to,
+.toast-leave-from {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.success-enter-active,
+.success-leave-active {
+  transition: opacity 260ms ease, transform 260ms ease;
+}
+.success-enter-from,
+.success-leave-to {
+  opacity: 0;
+  transform: translate(-50%, -12px) scale(0.98);
+}
+.success-enter-to,
+.success-leave-from {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+</style>
