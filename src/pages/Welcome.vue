@@ -3,7 +3,7 @@
     <div class="mx-auto flex min-h-[calc(100vh-3rem)] max-w-md flex-col">
       <div class="flex-1">
         <div class="text-center">
-          <h2 class="text-2xl font-semibold text-ink">Welcome to EZMENU</h2>
+          <h2 class="text-2xl font-semibold text-ink"><span class="italic">Welcome to</span> <b class="text-accent">EzMenu</b></h2>
           <p class="mt-2 text-sm text-ink/60">
             Explore today’s menu, add to cart, and checkout easily.
           </p>

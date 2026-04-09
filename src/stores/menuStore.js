@@ -120,17 +120,26 @@ export const useMenuStore = defineStore("menu", {
           "https://allwaysdelicious.com/wp-content/uploads/2025/06/sticky-rice-mango-sq.jpg"
       }
     ],
-    activeCategory: "all"
+    activeCategory: "all",
+    favoriteIds: []
   }),
   getters: {
     filteredItems: (state) => {
       if (state.activeCategory === "all") return state.items;
       return state.items.filter((i) => i.category === state.activeCategory);
-    }
+    },
+    favoriteItems: (state) => state.items.filter((item) => state.favoriteIds.includes(item.id))
   },
   actions: {
     setCategory(category) {
       this.activeCategory = category;
+    },
+    toggleFavorite(itemId) {
+      if (this.favoriteIds.includes(itemId)) {
+        this.favoriteIds = this.favoriteIds.filter((id) => id !== itemId);
+        return;
+      }
+      this.favoriteIds = [...this.favoriteIds, itemId];
     }
   }
 });

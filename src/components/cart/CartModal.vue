@@ -11,7 +11,6 @@
           <CartList
             v-if="step === 'cart'"
             :items="items"
-            :toast-message="toastMessage"
             :format-khr="formatKHR"
             @increment="increment"
             @decrement="decrement"
@@ -76,7 +75,7 @@ const props = defineProps({
   open: { type: Boolean, default: false }
 });
 
-const emit = defineEmits(["close", "checkout"]);
+const emit = defineEmits(["close", "checkout", "removed"]);
 const cart = useCartStore();
 const items = computed(() => cart.items);
 const count = computed(() => cart.count);
@@ -88,15 +87,9 @@ const close = () => emit("close");
 const increment = (id) => cart.increment(id);
 const decrement = (id) => cart.decrement(id);
 
-const toastMessage = ref("");
-let toastTimer = null;
 const remove = ({ id, name }) => {
   cart.removeItem(id);
-  toastMessage.value = `Removed ${name}`;
-  if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => {
-    toastMessage.value = "";
-  }, 1400);
+  emit("removed", name);
 };
 
 const step = ref("cart");
@@ -117,7 +110,7 @@ const referenceId = ref("");
 const selectedBankName = computed(() => banks.find((b) => b.id === selectedBank.value)?.name ?? "");
 
 const primaryLabel = computed(() => {
-  if (step.value === "cart") return "Checkout";
+  if (step.value === "cart") return "Paynow";
   if (step.value === "payment") return "Confirm Payment";
   return "Done";
 });
@@ -157,17 +150,6 @@ watch(
   (value) => {
     if (value) {
       step.value = "cart";
-    }
-  }
-);
-
-watch(
-  () => props.open,
-  (value) => {
-    if (!value && toastTimer) {
-      clearTimeout(toastTimer);
-      toastTimer = null;
-      toastMessage.value = "";
     }
   }
 );

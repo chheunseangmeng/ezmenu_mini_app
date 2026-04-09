@@ -13,7 +13,7 @@
 
       <div class="mt-4 rounded-2xl border border-white/70 bg-white/80 p-3">
         <div class="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-ink/50">
-          <span>Items</span>
+          <span>{{ itemLabel }}</span>
           <span>Amount</span>
         </div>
         <div class="mt-3 space-y-2">
@@ -28,6 +28,10 @@
         </div>
         <div class="mt-3 grid gap-2 border-t border-white/70 pt-3 text-xs text-ink/60">
           <div class="flex items-center justify-between">
+            <span>Paid via</span>
+            <span class="font-semibold text-ink">{{ selectedBankName }}</span>
+          </div>
+          <div class="flex items-center justify-between">
             <span>Transaction ID</span>
             <span class="font-semibold text-ink">{{ transactionId }}</span>
           </div>
@@ -40,10 +44,6 @@
             <span class="font-semibold text-ink">{{ receiptDate }}</span>
           </div>
         </div>
-      </div>
-
-      <div class="mt-3 text-sm text-ink/70">
-        Paid via <span class="font-semibold text-ink">{{ selectedBankName }}</span>
       </div>
 
       <div class="mt-3 rounded-2xl border border-white/70 bg-white/70 p-3 text-sm text-ink/70">
@@ -61,7 +61,9 @@
 </template>
 
 <script setup>
-defineProps({
+import { computed } from "vue";
+
+const props = defineProps({
   items: { type: Array, default: () => [] },
   receiptId: { type: String, default: "" },
   transactionId: { type: String, default: "" },
@@ -71,4 +73,9 @@ defineProps({
   totalUsd: { type: Number, default: 0 },
   totalKhrFormatted: { type: String, default: "0" }
 });
+
+const totalQuantity = computed(() =>
+  props.items.reduce((sum, item) => sum + item.quantity, 0)
+);
+const itemLabel = computed(() => (totalQuantity.value === 1 ? "Item" : "Items"));
 </script>

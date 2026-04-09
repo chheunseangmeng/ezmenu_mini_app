@@ -11,7 +11,7 @@
       </button>
       <div v-else>
         <p class="text-sm font-semibold text-ink">Your Cart</p>
-        <p class="text-xs text-ink/50">{{ count }} items</p>
+        <p class="text-xs text-ink/50">{{ count }} {{ count === 1 ? "item" : "items" }}</p>
       </div>
     </div>
     <button

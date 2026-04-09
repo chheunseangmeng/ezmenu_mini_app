@@ -1,14 +1,5 @@
 <template>
   <div class="mt-4 max-h-[50vh] overflow-y-auto pr-1">
-    <transition name="mini-toast">
-      <div
-        v-if="toastMessage"
-        class="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs text-emerald-700"
-      >
-        <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-        {{ toastMessage }}
-      </div>
-    </transition>
     <transition-group name="cart-item" tag="div" class="space-y-3">
       <div
         v-for="item in items"
@@ -53,28 +44,12 @@
 <script setup>
 const props = defineProps({
   items: { type: Array, default: () => [] },
-  toastMessage: { type: String, default: "" },
   formatKHR: { type: Function, default: (value) => value }
 });
 defineEmits(["increment", "decrement", "remove"]);
 </script>
 
 <style scoped>
-.mini-toast-enter-active,
-.mini-toast-leave-active {
-  transition: opacity 200ms ease, transform 200ms ease;
-}
-.mini-toast-enter-from,
-.mini-toast-leave-to {
-  opacity: 0;
-  transform: translateY(-6px);
-}
-.mini-toast-enter-to,
-.mini-toast-leave-from {
-  opacity: 1;
-  transform: translateY(0);
-}
-
 .cart-item-enter-active,
 .cart-item-leave-active {
   transition: opacity 200ms ease, transform 200ms ease;

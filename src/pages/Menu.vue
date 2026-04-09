@@ -1,8 +1,18 @@
 <template>
   <section class="relative px-5 pb-28 pt-6">
     <div class="mx-auto max-w-xl">
-      <div class="mb-3">
+      <div class="mb-3 flex items-center justify-between gap-3">
         <h2 class="text-xl text-ink">Order Menu</h2>
+        <button
+          class="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold transition duration-200"
+          :class="showFavorites
+            ? 'border-transparent bg-rose-500 text-white shadow-[0_10px_25px_-16px_rgba(244,63,94,0.95)]'
+            : 'border-white/70 bg-white/75 text-ink/70 hover:bg-white'"
+          @click="toggleFavoriteView"
+        >
+          <i :class="showFavorites ? 'fa-solid fa-chevron-left' : 'fa-regular fa-heart'"></i>
+          {{ showFavorites ? "All Menu" : "My Favorite" }}
+        </button>
       </div>
 
       <div class="mb-4">
@@ -20,6 +30,7 @@
       </div>
 
       <CategoryNav
+        v-if="!showFavorites"
         :categories="categories"
         :active-category="activeCategory"
         @change="setCategory"
@@ -28,7 +39,7 @@
       <transition name="toast">
         <div
           v-if="toast"
-          class="fixed top-6 left-1/2 z-50 -translate-x-1/2 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50/90 px-4 py-2 text-xs text-emerald-700 shadow-[0_20px_40px_-28px_rgba(16,185,129,0.9)] backdrop-blur-xl"
+          class="fixed top-6 left-1/2 z-[70] -translate-x-1/2 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50/90 px-4 py-2 text-xs text-emerald-700 shadow-[0_20px_40px_-28px_rgba(16,185,129,0.9)] backdrop-blur-xl"
         >
           <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
           {{ toast }}
@@ -38,7 +49,7 @@
       <transition name="success">
         <div
           v-if="successToast"
-          class="fixed top-14 left-1/2 z-50 -translate-x-1/2 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50/90 px-4 py-2 text-xs text-emerald-700 shadow-[0_20px_40px_-28px_rgba(16,185,129,0.9)] backdrop-blur-xl"
+          class="fixed top-14 left-1/2 z-[70] -translate-x-1/2 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50/90 px-4 py-2 text-xs text-emerald-700 shadow-[0_20px_40px_-28px_rgba(16,185,129,0.9)] backdrop-blur-xl"
         >
           <span class="grid h-5 w-5 place-items-center rounded-full bg-emerald-500 text-white">
             <i class="fa-solid fa-check text-[10px]"></i>
@@ -47,11 +58,27 @@
         </div>
       </transition>
 
-      <MenuGrid :items="items" @add="add" />
+      <MenuGrid
+        :items="items"
+        :favorite-ids="favoriteIds"
+        @add="add"
+        @toggle-favorite="toggleFavorite"
+      />
+      <div
+        v-if="showFavorites && items.length === 0"
+        class="mt-5 rounded-2xl border border-dashed border-pebble/70 bg-cream/60 p-6 text-center text-sm text-ink/60"
+      >
+        No favorites yet. Tap the heart icon on any menu item to save it here.
+      </div>
     </div>
 
     <CartBar @open="openCart" />
-    <CartModal :open="isCartOpen" @close="closeCart" @checkout="checkout" />
+    <CartModal
+      :open="isCartOpen"
+      @close="closeCart"
+      @checkout="checkout"
+      @removed="handleRemoved"
+    />
   </section>
 </template>
 
@@ -67,9 +94,10 @@ import { useMenuStore } from "../stores/menuStore";
 const cart = useCartStore();
 const menu = useMenuStore();
 const searchQuery = ref("");
+const showFavorites = ref(false);
 const items = computed(() => {
   const query = searchQuery.value.trim().toLowerCase();
-  const base = menu.filteredItems;
+  const base = showFavorites.value ? menu.favoriteItems : menu.filteredItems;
   if (!query) return base;
   return base.filter((item) => {
     return (
@@ -81,11 +109,25 @@ const items = computed(() => {
 
 const categories = computed(() => menu.categories);
 const activeCategory = computed(() => menu.activeCategory);
+const favoriteIds = computed(() => menu.favoriteIds);
 const setCategory = (key) => menu.setCategory(key);
+const toggleFavoriteView = () => {
+  showFavorites.value = !showFavorites.value;
+};
+const toggleFavorite = (itemId) => {
+  menu.toggleFavorite(itemId);
+};
 const add = (item) => {
   cart.addItem(item);
   const tg = window.Telegram?.WebApp;
   tg?.HapticFeedback?.impactOccurred?.("light");
+};
+const handleRemoved = (name) => {
+  toast.value = `Removed ${name}`;
+  if (timer) clearTimeout(timer);
+  timer = setTimeout(() => {
+    toast.value = "";
+  }, 1400);
 };
 
 const isCartOpen = ref(false);

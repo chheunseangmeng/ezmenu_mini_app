@@ -9,7 +9,7 @@
       <div>
         <p class="text-xs uppercase tracking-[0.2em] text-ink/50">Cart</p>
         <p class="text-base font-semibold">
-          <i class="fa-solid fa-cart-arrow-down"></i> {{ count }} items
+          <i class="fa-solid fa-cart-arrow-down"></i> {{ count }} {{ count === 1 ? "item" : "items" }}
         </p>
       </div>
       <div class="text-right">

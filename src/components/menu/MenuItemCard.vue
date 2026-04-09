@@ -10,6 +10,14 @@
         class="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
       />
       <div class="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-ink/40 to-transparent"></div>
+      <button
+        class="absolute right-2 top-2 grid h-9 w-9 place-items-center rounded-full border border-white/70 bg-white/85 text-sm shadow-[0_10px_20px_-14px_rgba(17,38,55,0.6)]"
+        :class="isFavorite ? 'text-rose-500' : 'text-ink/60'"
+        aria-label="Toggle favorite"
+        @click.stop="toggleFavorite"
+      >
+        <i :class="isFavorite ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"></i>
+      </button>
     </div>
 
     <div class="mt-3 flex flex-1 flex-col gap-2 px-1 pb-1">
@@ -37,10 +45,12 @@
 <script setup>
 
 const props = defineProps({
-  item: { type: Object, required: true }
+  item: { type: Object, required: true },
+  isFavorite: { type: Boolean, default: false }
 });
 
-const emit = defineEmits(["add"]);
+const emit = defineEmits(["add", "toggle-favorite"]);
 const add = () => emit("add", props.item);
+const toggleFavorite = () => emit("toggle-favorite", props.item.id);
 const formatKHR = (value) => new Intl.NumberFormat("en-US").format(Math.round(value));
 </script>
