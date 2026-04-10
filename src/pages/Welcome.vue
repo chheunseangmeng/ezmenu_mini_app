@@ -1,122 +1,121 @@
 <template>
-  <section class="h-screen overflow-hidden px-5 py-5">
-    <div class="mx-auto flex h-full max-w-md flex-col">
-      <!-- TOP CONTENT -->
-      <div class="flex-1 overflow-hidden">
-        <!-- Header -->
-        <div class="text-center">
-          <h2 class="text-2xl font-semibold text-ink">
-            <span class="italic">Welcome to</span>
-            <b class="text-accent">EzMenu</b>
-          </h2>
-          <p class="text-sm text-ink/60">Explore today’s menu, add to cart, and checkout easily.</p>
-        </div>
-        <!-- GRID -->
-        <div class="glass-strong relative mt-4 overflow-hidden rounded-[32px] p-5">
-          <div class="grid grid-cols-2 gap-3">
+  <section class="h-screen flex flex-col px-5 py-4 overflow-hidden">
+
+    <div class="mx-auto flex flex-1 flex-col max-w-md min-h-0">
+
+      <!-- HEADER -->
+      <div class="shrink-0 text-center">
+        <h2 class="text-xl sm:text-2xl font-semibold text-ink">
+          <span class="italic">Welcome to</span> <span class="font-bold text-accent">EzMenu'</span>
+        </h2>
+
+        <p class="text-xs sm:text-sm text-ink/60">
+          Explore today’s menu, add to cart, and checkout easily.
+        </p>
+      </div>
+
+      <!-- GRID -->
+      <div class="flex-[0.6] min-h-0 mt-3">
+        <div class="glass-strong h-full rounded-[22px] p-3 sm:p-5">
+
+          <div class="grid grid-cols-2 gap-3 h-full auto-rows-fr">
+
             <div
               v-for="card in gridCards"
               :key="card.id"
-              class="relative h-36 w-full overflow-hidden rounded-2xl"
-              :class="
-                card.glass
-                  ? 'border border-white/70 bg-white/60 p-4 shadow-[0_20px_35px_-25px_rgba(15,29,40,0.4)] backdrop-blur-xl'
-                  : ''
-              "
+              class="relative w-full h-full aspect-square overflow-hidden rounded-xl"
+              :class="card.glass
+                ? 'border border-white/70 bg-white/60 p-3 sm:p-4 backdrop-blur-xl'
+                : ''"
             >
-              <!-- IMAGE CARD -->
+
+              <!-- IMAGE -->
               <template v-if="card.image">
                 <img
                   :src="card.image"
-                  :alt="card.title"
-                  class="h-full w-full object-cover"
+                  class="absolute inset-0 w-full h-full object-cover"
                 />
-                <div
-                  class="absolute inset-0 bg-gradient-to-t from-ink/60 via-ink/5 to-transparent"
-                ></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent"></div>
               </template>
 
-              <!-- EMPTY CARD EFFECT -->
+              <!-- EMPTY -->
               <template v-else>
-                <div
-                  class="absolute -left-6 -top-6 h-20 w-20 rounded-full bg-blush/50 blur-2xl"
-                ></div>
-                <div
-                  class="absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-breeze/50 blur-2xl"
-                ></div>
-                <div
-                  class="absolute inset-0 bg-gradient-to-t from-ink/5 via-transparent to-transparent"
-                ></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-ink/5 via-transparent to-transparent"></div>
               </template>
 
-              <!-- TEXT (NON GLASS) -->
-              <div
-                v-if="!card.glass"
-                class="absolute bottom-3 left-3"
-                :class="card.lightText ? 'text-white' : 'text-ink'"
-              >
-                <p class="text-sm font-semibold">{{ card.title }}</p>
-                <p
-                  class="text-[11px]"
-                  :class="card.lightText ? 'text-white/80' : 'text-ink/60'"
-                >
+              <!-- TEXT -->
+              <div class="absolute bottom-2 left-2 right-2 text-white">
+                <p class="text-xs sm:text-sm font-semibold">
+                  {{ card.title }}
+                </p>
+                <p class="text-[10px] sm:text-xs text-white/80">
                   {{ card.subtitle }}
                 </p>
               </div>
 
-              <!-- GLASS CARD -->
-              <div v-else class="relative flex h-full flex-col justify-between">
-                <p class="text-xs uppercase tracking-[0.2em] text-ink/40">
+              <!-- GLASS -->
+              <div
+                v-if="card.glass"
+                class="relative h-full flex flex-col justify-between text-ink"
+              >
+                <p class="text-[10px] uppercase tracking-widest opacity-40">
                   {{ card.brand }}
                 </p>
-                <h1 class="text-base font-semibold text-ink">
+
+                <h1 class="text-sm sm:text-base font-semibold">
                   {{ card.headline }}
                 </h1>
-                <p class="text-xs text-ink/60">
+
+                <p class="text-[10px] sm:text-xs opacity-70">
                   {{ card.description }}
                 </p>
-
-                <div>
-                  <p class="text-sm font-semibold text-ink">
-                    {{ card.title }}
-                  </p>
-                  <p class="text-[11px] text-ink/60">
-                    {{ card.subtitle }}
-                  </p>
-                </div>
               </div>
+
             </div>
+
           </div>
         </div>
-
-        <!-- HERO SLIDE -->
-        <div class="mt-3">
-          <transition name="hero" mode="out-in">
-            <div
-              :key="activeSlide.id"
-              class="glass-card relative h-40 w-full overflow-hidden rounded-3xl"
-            >
-              <img
-                :src="activeSlide.image"
-                :alt="activeSlide.title"
-                class="h-full w-full object-cover"
-              />
-              <div class="absolute inset-0 bg-gradient-to-r from-ink/70 via-ink/30 to-transparent"></div>
-              <div class="absolute left-5 top-5 text-white">
-                <p class="text-xs uppercase tracking-[0.2em] text-white/70">Featured</p>
-                <h3 class="mt-2 text-lg font-semibold">{{ activeSlide.title }}</h3>
-                <p class="mt-1 text-sm text-white/80">{{ activeSlide.subtitle }}</p>
-              </div>
-            </div>
-          </transition>
-        </div>
       </div>
+
+      <!-- HERO (FIXED RESPONSIVE HEIGHT) -->
+      <div class="flex-[0.6] min-h-0 mt-3">
+        <transition name="hero" mode="out-in">
+          <div
+            :key="activeSlide.id"
+            class="relative w-full h-full max-h-[160px] rounded-2xl overflow-hidden"
+          >
+            <img
+              :src="activeSlide.image"
+              class="absolute inset-0 w-full h-full object-cover"
+            />
+
+            <div class="absolute inset-0 bg-gradient-to-r from-ink/70 via-ink/30 to-transparent"></div>
+
+            <div class="absolute left-3 top-3 text-white">
+              <p class="text-[10px] sm:text-xs opacity-70">Featured</p>
+
+              <h3 class="text-sm sm:text-lg font-semibold">
+                {{ activeSlide.title }}
+              </h3>
+
+              <p class="text-xs opacity-80">
+                {{ activeSlide.subtitle }}
+              </p>
+            </div>
+          </div>
+        </transition>
+      </div>
+
       <!-- BUTTON -->
-      <router-link
-        to="/menu"
-        class="w-full rounded-2xl bg-accent py-3 text-center text-sm font-semibold text-white shadow-[0_20px_40px_-25px_rgba(255,92,66,0.9)]">
-        Get Start Now
-      </router-link>
+      <div class="shrink-0 mt-2">
+        <router-link
+          to="/menu"
+          class="w-full block rounded-xl bg-accent hover:bg-accent/80 py-3 text-center text-sm font-semibold text-white"
+        >
+          Get Start Now
+        </router-link>
+      </div>
+
     </div>
   </section>
 </template>
@@ -150,8 +149,8 @@ const gridCards = [
     lightText: true,
   },
   {
-    subtitle: "Daily chef picks",
-    brand: "EZMENU",
+    subtitle: "",
+    brand:"EzMenu",
     headline: "Fresh bites, fast checkout.",
     description: "Pick favorites and order in minutes.",
     glass: true,
@@ -204,10 +203,12 @@ onBeforeUnmount(() => {
 .hero-leave-active {
   transition: opacity 400ms ease;
 }
+
 .hero-enter-from,
 .hero-leave-to {
   opacity: 0;
 }
+
 .hero-enter-to,
 .hero-leave-from {
   opacity: 1;
