@@ -4,7 +4,7 @@
       <div class="flex-1">
         <div class="text-center">
           <h2 class="text-2xl font-semibold text-ink"><span class="italic">Welcome to</span> <b class="text-accent">EzMenu</b></h2>
-          <p class="mt-2 text-sm text-ink/60">
+          <p class="text-sm text-ink/60">
             Explore today’s menu, add to cart, and checkout easily.
           </p>
         </div>
@@ -69,7 +69,7 @@
         to="/menu"
         class="mt-6 w-full rounded-2xl bg-accent py-3 text-center text-sm font-semibold text-white shadow-[0_20px_40px_-25px_rgba(255,92,66,0.9)]"
       >
-        Get Started
+        Get Start Now
       </router-link>
     </div>
   </section>
