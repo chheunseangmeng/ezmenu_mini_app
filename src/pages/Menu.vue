@@ -162,40 +162,15 @@ const successToast = ref(false);
 let successTimer = null;
 
 const tg = window.Telegram?.WebApp;
-const updateMainButton = () => {
-  if (!tg?.MainButton) return;
-  if (cart.count > 0) {
-    tg.MainButton.setParams({
-      text: `Checkout • $${cart.total.toFixed(2)}`,
-      color: "#FF5533",
-      text_color: "#FFFFFF",
-      is_active: true
-    });
-    tg.MainButton.show();
-  } else {
-    tg.MainButton.hide();
-  }
-};
-
-const handleMainButton = () => {
-  checkout();
-};
 
 onMounted(() => {
   if (!tg) return;
   tg.ready();
   tg.expand();
-  tg.MainButton?.onClick(handleMainButton);
-  updateMainButton();
+  tg.MainButton?.hide();
 });
 
 onBeforeUnmount(() => {
-  tg?.MainButton?.offClick?.(handleMainButton);
+  tg?.MainButton?.hide();
 });
-
-watch(
-  () => [cart.count, cart.total],
-  () => updateMainButton(),
-  { immediate: true }
-);
 </script>
