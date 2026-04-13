@@ -3,39 +3,41 @@
     <div v-if="open" class="fixed inset-0 z-50 bg-ink/60 backdrop-blur-sm" @click.self="close">
       <transition name="slide-up">
         <section
-          class="glass-card absolute bottom-0 left-0 right-0 mx-auto w-full max-w-md rounded-t-3xl px-5 pb-6 pt-5"
+          class="glass-card absolute bottom-0 left-0 right-0 mx-auto flex max-h-[90dvh] w-full max-w-md flex-col overflow-hidden rounded-t-3xl px-5 pb-6 pt-5"
           style="padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));"
         >
           <CartHeader :step="step" :count="count" @back="back" @close="close" />
 
-          <CartList
-            v-if="step === 'cart'"
-            :items="items"
-            :format-khr="formatKHR"
-            @increment="increment"
-            @decrement="decrement"
-            @remove="remove"
-          />
+          <div class="mt-3 flex-1 min-h-0 overflow-y-auto pr-1 no-scrollbar">
+            <CartList
+              v-if="step === 'cart'"
+              :items="items"
+              :format-khr="formatKHR"
+              @increment="increment"
+              @decrement="decrement"
+              @remove="remove"
+            />
 
-          <CartPayment
-            v-else-if="step === 'payment'"
-            :banks="banks"
-            :selected-bank="selectedBank"
-            :payment-account="paymentAccount"
-            @select="setBank"
-          />
+            <CartPayment
+              v-else-if="step === 'payment'"
+              :banks="banks"
+              :selected-bank="selectedBank"
+              :payment-account="paymentAccount"
+              @select="setBank"
+            />
 
-          <CartReceipt
-            v-else
-            :items="items"
-            :receipt-id="receiptId"
-            :transaction-id="transactionId"
-            :reference-id="referenceId"
-            :receipt-date="receiptDate"
-            :selected-bank-name="selectedBankName"
-            :total-usd="totalUSD"
-            :total-khr-formatted="formatKHR(totalKHR)"
-          />
+            <CartReceipt
+              v-else
+              :items="items"
+              :receipt-id="receiptId"
+              :transaction-id="transactionId"
+              :reference-id="referenceId"
+              :receipt-date="receiptDate"
+              :selected-bank-name="selectedBankName"
+              :total-usd="totalUSD"
+              :total-khr-formatted="formatKHR(totalKHR)"
+            />
+          </div>
 
           <div class="mt-5 rounded-2xl bg-ink px-4 py-3 text-white">
             <div class="flex items-center justify-between text-sm">
